@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+html_code = """<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -208,7 +208,7 @@
         <div class="bg-black/30 p-3 rounded border border-gray-600/40 mb-4 flex flex-wrap items-center justify-between gap-3">
             <!-- 難易度選択ボタングループ -->
             <div class="flex items-center gap-1 sm:gap-2">
-                <button onclick="setDifficulty('easy')" id="btn-easy" class="px-2.5 py-1 text-xs sm:text-sm font-semibold rounded bg-gray-700 hover:bg-gray-600 border border-gray-500 transition text-gray-200">
+                <button onclick="setDifficulty('easy')" id="btn-easy" class="px-2.5 py-1 text-xs sm:text-sm font-semibold rounded bg-amber-600 text-black border border-amber-400 shadow">
                     EASY (9x9)
                 </button>
                 <button onclick="setDifficulty('medium')" id="btn-medium" class="px-2.5 py-1 text-xs sm:text-sm font-semibold rounded bg-gray-700 hover:bg-gray-600 border border-gray-500 transition text-gray-200">
@@ -290,7 +290,7 @@
         // ゲーム状態変数
         let currentDifficulty = 'easy';
         let rows = CONFIGS.easy.rows;
-        let cols = CONFIGS.cols ? CONFIGS.easy.cols : 9; // 既存定義
+        let cols = CONFIGS.easy.cols;
         let mineCount = CONFIGS.easy.mines;
 
         let board = []; // { mine: bool, revealed: bool, flagged: bool, count: int }
@@ -303,8 +303,9 @@
         let mobileFlagMode = false; // スマホでのフラグモード
 
         // MP3音声ファイルのインスタンス生成（事前読み込み）
-        const soundBlock = new Audio('ブロックを置く.mp3');
-        const soundExplode = new Audio('爆発2.mp3');
+        const soundBlock = new Audio('効果音/ブロックを置く.mp3');
+        const soundTreasure = new Audio('効果音/宝箱を開ける.mp3');
+        const soundExplode = new Audio('効果音/爆発2.mp3');
 
         // Web Audio API による補助音響システム (フォールバック用)
         let audioCtx = null;
@@ -333,7 +334,7 @@
             if (!soundEnabled) return;
             try {
                 if (type === 'click') {
-                    // 「ブロックを置く.mp3」を再生
+                    // 「効果音/ブロックを置く.mp3」を再生
                     const audio = soundBlock.cloneNode();
                     audio.volume = 0.8;
                     audio.play().catch(() => {
@@ -355,7 +356,7 @@
                         osc.stop(now + 0.05);
                     });
                 } else if (type === 'explode') {
-                    // 「爆発2.mp3」を再生
+                    // 「効果音/爆発2.mp3」を再生
                     const audio = soundExplode.cloneNode();
                     audio.volume = 1.0;
                     audio.play().catch(() => {
@@ -403,22 +404,27 @@
                     osc.start(now);
                     osc.stop(now + 0.04);
                 } else if (type === 'win') {
-                    // 勝利音（インダストリアルチャイム）
-                    initAudio();
-                    if (!audioCtx) return;
-                    const ctx = audioCtx;
-                    const now = ctx.currentTime;
-                    [261.63, 329.63, 392.00, 523.25].forEach((freq, idx) => {
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
-                        gain.gain.setValueAtTime(0.3, now + idx * 0.1);
-                        gain.gain.linearRampToValueAtTime(0.001, now + idx * 0.1 + 0.3);
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.start(now + idx * 0.1);
-                        osc.stop(now + idx * 0.1 + 0.3);
+                    // 勝利音：「効果音/宝箱を開ける.mp3」を再生
+                    const audio = soundTreasure.cloneNode();
+                    audio.volume = 0.9;
+                    audio.play().catch(() => {
+                        // MP3再生失敗時のフォールバック（合成音）
+                        initAudio();
+                        if (!audioCtx) return;
+                        const ctx = audioCtx;
+                        const now = ctx.currentTime;
+                        [261.63, 329.63, 392.00, 523.25].forEach((freq, idx) => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                            gain.gain.setValueAtTime(0.3, now + idx * 0.1);
+                            gain.gain.linearRampToValueAtTime(0.001, now + idx * 0.1 + 0.3);
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.start(now + idx * 0.1);
+                            osc.stop(now + idx * 0.1 + 0.3);
+                        });
                     });
                 }
             } catch (e) {
@@ -981,3 +987,9 @@
     </script>
 </body>
 </html>
+"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_code)
+
+print("index.html が正常に生成・更新されました。")
