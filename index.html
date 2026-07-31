@@ -183,8 +183,7 @@
 <body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4 select-none relative overflow-hidden">
 
     <!-- BGM用オーディオ要素（Zero_Time_Outageのループ再生） -->
-    <audio src="効果音/Zero_Time_Outage.mp3" loop autoplay></audio>
-
+   <audio id="bgm" src="効果音/Zero_Time_Outage.mp3" loop></audio>
     <!-- 爆発時フラッシュオーバーレイ -->
     <div id="flash-overlay" class="fixed inset-0 pointer-events-none z-40"></div>
 
@@ -306,7 +305,7 @@
         let mobileFlagMode = false; // スマホでのフラグモード
 
         // BGMエレメントの取得
-        const bgmAudio = document.getElementById('効果音/Zero_Time_Outage.mp3');
+        const bgmAudio = document.getElementById('bgm');
 
         // MP3音声ファイルのインスタンス生成（事前読み込み）
         const soundBlock = new Audio('効果音/ブロックを置く.mp3');
