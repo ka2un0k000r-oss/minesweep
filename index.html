@@ -304,7 +304,7 @@ html_code = """<!DOCTYPE html>
 
         // MP3音声ファイルのインスタンス生成（事前読み込み）
         const soundBlock = new Audio('効果音/ブロックを置く.mp3');
-        const soundPlaceTreasure = new Audio('効果音/宝箱を開ける.mp3');
+        const soundPlaceTreasure = new Audio('効果音/決定ボタンを押す38.mp3');
         const soundExplode = new Audio('効果音/爆発2.mp3');
 
         // Web Audio API による補助音響システム (フォールバック用)
@@ -387,7 +387,7 @@ html_code = """<!DOCTYPE html>
                         noise.stop(now + 0.5);
                     });
                 } else if (type === 'flag') {
-                    // 「効果音/宝箱を開ける.mp3」を再生
+                    // 「効果音/決定ボタンを押す38.mp3」を再生
                     const audio = soundPlaceTreasure.cloneNode();
                     audio.volume = 0.9;
                     audio.play().catch(() => {
