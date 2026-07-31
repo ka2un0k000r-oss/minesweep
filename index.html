@@ -304,7 +304,7 @@ html_code = """<!DOCTYPE html>
 
         // MP3音声ファイルのインスタンス生成（事前読み込み）
         const soundBlock = new Audio('効果音/ブロックを置く.mp3');
-        const soundTreasure = new Audio('効果音/宝箱を開ける.mp3');
+        const soundPlaceTreasure = new Audio('効果音/宝箱を置ける.mp3');
         const soundExplode = new Audio('効果音/爆発2.mp3');
 
         // Web Audio API による補助音響システム (フォールバック用)
@@ -387,25 +387,8 @@ html_code = """<!DOCTYPE html>
                         noise.stop(now + 0.5);
                     });
                 } else if (type === 'flag') {
-                    // フラグ設置（金属的なカチッという音）
-                    initAudio();
-                    if (!audioCtx) return;
-                    const ctx = audioCtx;
-                    const now = ctx.currentTime;
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(800, now);
-                    osc.frequency.linearRampToValueAtTime(400, now + 0.04);
-                    gain.gain.setValueAtTime(0.3, now);
-                    gain.gain.linearRampToValueAtTime(0.001, now + 0.04);
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.04);
-                } else if (type === 'win') {
-                    // 勝利音：「効果音/宝箱を開ける.mp3」を再生
-                    const audio = soundTreasure.cloneNode();
+                    // 「効果音/宝箱を置ける.mp3」を再生
+                    const audio = soundPlaceTreasure.cloneNode();
                     audio.volume = 0.9;
                     audio.play().catch(() => {
                         // MP3再生失敗時のフォールバック（合成音）
@@ -413,19 +396,20 @@ html_code = """<!DOCTYPE html>
                         if (!audioCtx) return;
                         const ctx = audioCtx;
                         const now = ctx.currentTime;
-                        [261.63, 329.63, 392.00, 523.25].forEach((freq, idx) => {
-                            const osc = ctx.createOscillator();
-                            const gain = ctx.createGain();
-                            osc.type = 'sine';
-                            osc.frequency.setValueAtTime(freq, now + idx * 0.1);
-                            gain.gain.setValueAtTime(0.3, now + idx * 0.1);
-                            gain.gain.linearRampToValueAtTime(0.001, now + idx * 0.1 + 0.3);
-                            osc.connect(gain);
-                            gain.connect(ctx.destination);
-                            osc.start(now + idx * 0.1);
-                            osc.stop(now + idx * 0.1 + 0.3);
-                        });
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(800, now);
+                        osc.frequency.linearRampToValueAtTime(400, now + 0.04);
+                        gain.gain.setValueAtTime(0.3, now);
+                        gain.gain.linearRampToValueAtTime(0.001, now + 0.04);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now);
+                        osc.stop(now + 0.04);
                     });
+                } else if (type === 'win') {
+                    // 勝利音は鳴らさない
                 }
             } catch (e) {
                 console.log('Audio error:', e);
@@ -692,7 +676,12 @@ html_code = """<!DOCTYPE html>
 
             cell.flagged = !cell.flagged;
             flagsUsed += cell.flagged ? 1 : -1;
-            playSound('flag');
+            
+            // フラグを「立てた時」のみ音を鳴らす場合
+            if (cell.flagged) {
+                playSound('flag');
+            }
+
             updateMineDisplay();
             updateCellDOM(r, c);
         }
